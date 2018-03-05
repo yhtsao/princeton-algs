@@ -1,0 +1,16 @@
+-- PercolationStats
+
+    
+    
+
+-- Percolation
+    Initial an N*N boolean array with value "false"
+    Initial WeightedQuickUnionUF with N^2
+
+    Open(row, col): call union(row * N + col)
+
+    isOpen: check the N*N boolean array
+
+    
+
+    
