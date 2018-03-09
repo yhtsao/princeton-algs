@@ -93,5 +93,4 @@ public class PercolationStats {
         }
         return model.numberOfOpenSites();
     }
-
 }
