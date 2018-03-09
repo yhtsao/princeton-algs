@@ -38,6 +38,7 @@ public class PercolationVisualizer {
         int opened = 0;
         for (int row = 1; row <= n; row++) {
             for (int col = 1; col <= n; col++) {
+                //System.out.println("isFull: " + perc.isFull(row, col) + ", isOpen: " + perc.isOpen(row, col));
                 if (perc.isFull(row, col)) {
                     StdDraw.setPenColor(StdDraw.BOOK_LIGHT_BLUE);
                     opened++;
@@ -62,7 +63,14 @@ public class PercolationVisualizer {
     }
 
     public static void main(String[] args) {
-        In in = new In(args[0]);      // input file
+        In in = null;
+        if (args.length == 1) {
+            in = new In(args[0]);      // input file
+        }
+        else {
+            in = new In("percolation-test/snake101.txt");      // input file
+        }
+
         int n = in.readInt();         // n-by-n percolation system
 
         // turn on animation mode

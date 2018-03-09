@@ -10,6 +10,7 @@ public class StdStatTest {
             System.out.println(arr[i]); 
         }
         System.out.println(StdStats.mean(arr));
+        arr = new double[] {(double)487/n};
         System.out.println(StdStats.stddev(arr));
 
         
