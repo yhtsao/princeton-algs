@@ -1,0 +1,51 @@
+########### Deque ###########
+
+    Node {
+        Node prev;
+        Node next;
+        Item value;
+    }
+
+    Deque {
+        Node first = null;
+        Node last = null;
+        numOfNode = 0;
+    }
+
+    addFirst(Item item) {
+        Node oldFirst = first;
+        first = new Node();
+        first.value = item;
+        first.next = oldFirst;
+        first.prev = null;
+        oldFirst.prev = first;
+        numOfNode++;
+    }
+
+    removeFirst() {
+        Item item = first.item;
+        first = first.next;
+        numOfNode--;
+        return item;
+    }
+
+    addLast(Item item) {
+        Node oldLast = last;
+        last = new Node();
+        last.value = item;
+        last.prev = oldLast;
+        last.next = null;
+        oldLast.next = last;
+        numOfNode++;
+    }
+
+    removeLast() {
+        Item item = last.item;
+        last = last.prev;
+        numOfNode--;
+    }
+
+    Corner cases:
+    1. do removeFirst and removeLast When "first" and "last" points to same node?
+
+
