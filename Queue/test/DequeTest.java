@@ -1,6 +1,6 @@
 import edu.princeton.cs.algs4.StdRandom;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ class DequeTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void addArrAndRemoveAll() {
         List<Integer> intList = genRandIntArray(100, 1, 65536);
         Deque<Integer> deque = new Deque<Integer>();
@@ -146,7 +146,7 @@ class DequeTest {
 
     }
 
-    private List<Integer> genRandIntArray(int numOfInt, int min, int max) {
+    public static List<Integer> genRandIntArray(int numOfInt, int min, int max) {
         List<Integer> intList = new ArrayList<Integer>();
         for (int i = 0; i < numOfInt; i++) {
             intList.add(StdRandom.uniform(min, max));

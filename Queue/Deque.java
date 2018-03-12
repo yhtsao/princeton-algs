@@ -6,6 +6,10 @@ public class Deque<Item> implements Iterable<Item> {
     private int numOfElem = 0;
     private Node first, last;
 
+    // construct an empty deque
+    public Deque() {
+    }
+
     // Node structure in deque
     private class Node {
         Node prev;
@@ -27,9 +31,6 @@ public class Deque<Item> implements Iterable<Item> {
         numOfElem++;
     }
 
-    // construct an empty deque
-    public Deque() {
-    }
 
     // is the deque empty?
     public boolean isEmpty() {

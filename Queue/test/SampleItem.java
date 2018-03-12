@@ -18,7 +18,7 @@ public class SampleItem {
     }
 
     private String randStr() {
-        return RandomStringUtils.random(256);
+        return RandomStringUtils.randomAlphanumeric(16);
     }
 
     private Integer randInt() {
@@ -51,20 +51,22 @@ public class SampleItem {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof SampleItem)) return false;
 
         SampleItem that = (SampleItem) o;
 
-        if (str != null ? !str.equals(that.str) : that.str != null) return false;
-        if (intNum != null ? !intNum.equals(that.intNum) : that.intNum != null) return false;
-        return floatNum != null ? floatNum.equals(that.floatNum) : that.floatNum == null;
+        if (!str.equals(that.str)) return false;
+        if (!intNum.equals(that.intNum)) return false;
+        if (!floatNum.equals(that.floatNum)) return false;
+        return strList.equals(that.strList);
     }
 
     @Override
     public int hashCode() {
-        int result = str != null ? str.hashCode() : 0;
-        result = 31 * result + (intNum != null ? intNum.hashCode() : 0);
-        result = 31 * result + (floatNum != null ? floatNum.hashCode() : 0);
+        int result = str.hashCode();
+        result = 31 * result + intNum.hashCode();
+        result = 31 * result + floatNum.hashCode();
+        result = 31 * result + strList.hashCode();
         return result;
     }
 }

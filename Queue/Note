@@ -48,4 +48,57 @@
     Corner cases:
     1. do removeFirst and removeLast When "first" and "last" points to same node?
 
+########### random queue ###########
+
+    Idea:
+        Use array to maintain elements in queue,
+        double array size when array is full,
+        halve array size when array is one-quarter full
+
+        enqueue -> add element to last position of array
+        dequeue -> randomly choose an element from array,
+            move the last element to current position
+
+
+    int n = 0;
+    Item[] items = new Item[];
+
+    resize(capacity) {
+        Item[] itemsCopy = new Item[capacity];
+        for (i = 0; i < n; i++) {
+            itemsCopy[i] = items[i];
+        }
+        items = itemsCopy;
+    }
+
+    enqueue(item) {
+        if (n == items.length)
+            resize(2 * items.length);
+
+        items[n++] = item;
+    }
+
+    dequeue() {
+        int rand = randElem();
+        item = items[rand];
+        items[rand] = items[--n];
+
+        if (n > 0 && n == items.length/4)
+            resize(items.length / 2);
+        return item;
+    }
+
+    sample() {
+        int rand = randElem();
+        item = items[rand];
+        return item;
+    }
+
+    randElem() {
+        int rand = StdRandom(n);
+        while (items[rand] == null) {
+            rand = StdRandom(n);
+        }
+        return rand;
+    }
 
