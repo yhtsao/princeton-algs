@@ -44,7 +44,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         Item item = valArr[rand];
 
         // move last element to current empty position
-        valArr[rand] = valArr[--numOfElem];
+        numOfElem--;
+        valArr[rand] = valArr[numOfElem];
+        valArr[numOfElem] = null;
 
         if (numOfElem > 0 && numOfElem == valArr.length / 4)
             resize(valArr.length / 2);
