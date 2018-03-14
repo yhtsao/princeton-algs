@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.StdRandom;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ class DequeTest {
 
         Iterator<Integer> iter = deque.iterator();
         int i = testValArr.length - 1;
-        while (iter.hasNext() || 1 == 1) {
+        while (iter.hasNext()) {
             int valueFromIter = iter.next();
             Assertions.assertEquals(testValArr[i], valueFromIter);
             i--;
@@ -90,7 +89,7 @@ class DequeTest {
     }
 
     @Test
-    @Disabled
+    //@Disabled
     public void addArrAndRemoveAll() {
         List<Integer> intList = genRandIntArray(100, 1, 65536);
         Deque<Integer> deque = new Deque<Integer>();
