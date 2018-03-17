@@ -1,12 +1,9 @@
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdRandom;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sun.jvm.hotspot.utilities.Assert;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class PointTest {
 
@@ -79,22 +76,24 @@ public class PointTest {
 
     @Test
     public void slopeOrder() {
-        int n = 10;
-        Point p = new Point(0, 0);
+        In in = new In("testcases/PointSlopeCompare01.txt");
+        int n = in.readInt();
+        Point p = new Point(in.readInt(), in.readInt());
         Point[] points = new Point[n];
-        for (int i = 0; i < n; i++) {
-            points[i] = new Point((i + 1) * 10, (i + 1) * 10);
+        int i = 0;
+        while (!in.isEmpty()) {
+            points[i++] = new Point(in.readInt(), in.readInt());
         }
+
+        Point[] correctOrderPoints = Arrays.copyOf(points, n);
         StdRandom.shuffle(points);
-        for (int i = 0; i < n; i++) {
-            System.out.println(points[i].toString());
-        }
+        for (i = 0; i < n; i++)
+            System.out.println(points[i].toString() + ", " + p.slopeTo(points[i]));
 
         Arrays.sort(points, p.slopeOrder());
 
-        for (int i = n - 1; i >= 0; i--) {
-            Point q = new Point((i + 1) * 10, (i + 1) * 10);
-            Assertions.assertEquals(q, points[i]);
+        for (i = 0; i < n; i++) {
+            Assertions.assertEquals(correctOrderPoints[i], points[i]);
         }
     }
 }
