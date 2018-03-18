@@ -1,45 +1,17 @@
 import edu.princeton.cs.algs4.In;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class BruteCollinearPointsTest {
-    @Test
-    @Disabled
-    public void lineWith3point() {
-        Point[] points = readPointFromFile("testcases/input3.txt");
-
-        BruteCollinearPoints collinearPoints = new BruteCollinearPoints(points);
-        Assertions.assertEquals(1, collinearPoints.numberOfSegments());
-
-        Point p = new Point(10000, 10000);
-        Point q = new Point(20000, 20000);
-        LineSegment lineSegment = new LineSegment(p, q);
-        Assertions.assertEquals(lineSegment, collinearPoints.segments()[0]);
-    }
-
-    @Test
-    public void lineWith4point() {
-        Point[] points = readPointFromFile("testcases/input4.txt");
-
-        BruteCollinearPoints collinearPoints = new BruteCollinearPoints(points);
-        Assertions.assertEquals(1, collinearPoints.numberOfSegments());
-
-        Point p = new Point(5000, 5000);
-        Point q = new Point(20000, 20000);
-        LineSegment lineSegment = new LineSegment(p, q);
-        Assertions.assertEquals(lineSegment, collinearPoints.segments()[0]);
-    }
-
+class FastCollinearPointsTest {
     @Test
     public void lineWith6point() {
         Point[] points = readPointFromFile("testcases/input6.txt");
 
-        BruteCollinearPoints collinearPoints = new BruteCollinearPoints(points);
+        FastCollinearPoints collinearPoints = new FastCollinearPoints(points);
         Assertions.assertEquals(1, collinearPoints.numberOfSegments());
 
         Point p = new Point(14000, 10000);
@@ -52,7 +24,7 @@ class BruteCollinearPointsTest {
     public void lineWith8point() {
         Point[] points = readPointFromFile("testcases/input8.txt");
 
-        BruteCollinearPoints collinearPoints = new BruteCollinearPoints(points);
+        FastCollinearPoints collinearPoints = new FastCollinearPoints(points);
         Assertions.assertEquals(2, collinearPoints.numberOfSegments());
 
         Point p = new Point(3000, 4000);
@@ -74,7 +46,7 @@ class BruteCollinearPointsTest {
         Point[] points = readPointFromFile("testcases/input40.txt");
         List<String> ans = readAnsFromFile("testcases/input40ans.txt");
 
-        BruteCollinearPoints collinearPoints = new BruteCollinearPoints(points);
+        FastCollinearPoints collinearPoints = new FastCollinearPoints(points);
         Assertions.assertEquals(ans.size(), collinearPoints.numberOfSegments());
 
         LineSegment[] lines = collinearPoints.segments();
@@ -84,15 +56,73 @@ class BruteCollinearPointsTest {
     }
 
     @Test
-    public void lineWithEquidistant() {
-        Point[] points = readPointFromFile("testcases/equidistant.txt");
-        List<String> ans = readAnsFromFile("testcases/equidistantans.txt");
+    public void lineWith5Horizontal() {
+        Point[] points = readPointFromFile("testcases/horizontal5.txt");
+        List<String> ans = readAnsFromFile("testcases/horizontal5ans.txt");
 
-        BruteCollinearPoints collinearPoints = new BruteCollinearPoints(points);
+        FastCollinearPoints collinearPoints = new FastCollinearPoints(points);
         Assertions.assertEquals(ans.size(), collinearPoints.numberOfSegments());
 
         LineSegment[] lines = collinearPoints.segments();
         for (LineSegment line : lines) {
+            Assertions.assertTrue(ans.contains(line.toString()));
+        }
+    }
+
+    @Test
+    public void lineWith5Vertical() {
+        Point[] points = readPointFromFile("testcases/vertical5.txt");
+        List<String> ans = readAnsFromFile("testcases/vertical5ans.txt");
+
+        FastCollinearPoints collinearPoints = new FastCollinearPoints(points);
+        Assertions.assertEquals(ans.size(), collinearPoints.numberOfSegments());
+
+
+        LineSegment[] lines = collinearPoints.segments();
+        for (LineSegment line : lines) {
+            //System.out.println(line.toString());
+            Assertions.assertTrue(ans.contains(line.toString()));
+        }
+    }
+
+    @Test
+    public void lineWith100Horizontal() {
+        Point[] points = readPointFromFile("testcases/horizontal100.txt");
+
+        FastCollinearPoints collinearPoints = new FastCollinearPoints(points);
+        Assertions.assertEquals(100, collinearPoints.numberOfSegments());
+    }
+
+    @Test
+    public void lineWith100Vertical() {
+        Point[] points = readPointFromFile("testcases/vertical100.txt");
+
+        FastCollinearPoints collinearPoints = new FastCollinearPoints(points);
+        Assertions.assertEquals(100, collinearPoints.numberOfSegments());
+    }
+
+    @Test
+    public void lineWith10000Points() {
+        Point[] points = readPointFromFile("testcases/input10000.txt");
+
+        FastCollinearPoints collinearPoints = new FastCollinearPoints(points);
+        System.out.println("number of line = " + collinearPoints.numberOfSegments());
+        for (int i = 0; i < collinearPoints.segments().length; i++) {
+            System.out.println(collinearPoints.segments()[i]);
+        }
+    }
+
+    @Test
+    public void lineWithEquidistant() {
+        Point[] points = readPointFromFile("testcases/equidistant.txt");
+        List<String> ans = readAnsFromFile("testcases/equidistantans.txt");
+
+        FastCollinearPoints collinearPoints = new FastCollinearPoints(points);
+        Assertions.assertEquals(ans.size(), collinearPoints.numberOfSegments());
+
+        LineSegment[] lines = collinearPoints.segments();
+        for (LineSegment line : lines) {
+            //System.out.println(line.toString());
             Assertions.assertTrue(ans.contains(line.toString()));
         }
     }
@@ -103,7 +133,7 @@ class BruteCollinearPointsTest {
 
         boolean catchIllegalArguExcep = false;
         try {
-            new BruteCollinearPoints(points);
+            new FastCollinearPoints(points);
         } catch (IllegalArgumentException e) {
             catchIllegalArguExcep = true;
         }
@@ -119,7 +149,7 @@ class BruteCollinearPointsTest {
         }
         boolean catchIllegalArguExcep = false;
         try {
-            new BruteCollinearPoints(points);
+            new FastCollinearPoints(points);
         } catch (IllegalArgumentException e) {
             catchIllegalArguExcep = true;
         }
