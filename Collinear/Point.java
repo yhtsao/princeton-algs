@@ -113,9 +113,9 @@ public class Point implements Comparable<Point> {
                 double slopeToO2 = slopeTo(o2);
 
                 if (slopeToO1 < slopeToO2)
-                    return 1;
-                else if (slopeToO1 > slopeToO2)
                     return -1;
+                else if (slopeToO1 > slopeToO2)
+                    return 1;
                 else
                     return 0;
             }
@@ -135,10 +135,4 @@ public class Point implements Comparable<Point> {
         return "(" + x + ", " + y + ")";
     }
 
-    /**
-     * Unit tests the Point data type.
-     */
-    public static void main(String[] args) {
-        /* YOUR CODE HERE */
-    }
 }

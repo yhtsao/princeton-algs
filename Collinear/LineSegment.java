@@ -17,10 +17,10 @@ public class LineSegment {
     /**
      * Initializes a new line segment.
      *
-     * @param  p one endpoint
-     * @param  q the other endpoint
+     * @param p one endpoint
+     * @param q the other endpoint
      * @throws NullPointerException if either <tt>p</tt> or <tt>q</tt>
-     *         is <tt>null</tt>
+     *                              is <tt>null</tt>
      */
     public LineSegment(Point p, Point q) {
         if (p == null || q == null) {
@@ -30,7 +30,7 @@ public class LineSegment {
         this.q = q;
     }
 
-    
+
     /**
      * Draws this line segment to standard draw.
      */
@@ -61,5 +61,15 @@ public class LineSegment {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LineSegment)) return false;
+        LineSegment that = (LineSegment) o;
+
+        return p.toString().equals(that.p.toString()) &&
+                q.toString().equals(that.q.toString());
+
+    }
 }
 

@@ -93,7 +93,7 @@ public class PointTest {
         Arrays.sort(points, p.slopeOrder());
 
         for (i = 0; i < n; i++) {
-            Assertions.assertEquals(correctOrderPoints[i], points[i]);
+            Assertions.assertEquals(correctOrderPoints[n - i - 1], points[i]);
         }
     }
 }
