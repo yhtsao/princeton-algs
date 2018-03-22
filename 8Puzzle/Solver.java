@@ -6,7 +6,8 @@ public class Solver {
      * @param initial
      */
     public Solver(Board initial) {
-
+        if (initial == null)
+            throw new IllegalArgumentException();
     }
 
     /**
