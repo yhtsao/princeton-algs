@@ -1,4 +1,6 @@
 public class Board {
+    private int dimension;
+    
     /**
      * construct a board from an n-by-n array of blocks
      * (where blocks[i][j] = block in row i, column j)
@@ -6,7 +8,9 @@ public class Board {
      * @param blocks
      */
     public Board(int[][] blocks) {
-
+        if (blocks == null || blocks.length == 0)
+            return null;
+        this.dimension = blocks.length;
     }
 
     /**
@@ -15,7 +19,7 @@ public class Board {
      * @return
      */
     public int dimension() {
-        return 0;
+        return dimension;
     }
 
     /**
