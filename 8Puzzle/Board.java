@@ -1,5 +1,5 @@
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Stack;
 
 public class Board {
     private final int goalBlock[][];
@@ -109,12 +109,59 @@ public class Board {
      * @return
      */
     public Iterable<Board> neighbors() {
-        return new Iterable<Board>() {
-            @Override
-            public Iterator<Board> iterator() {
-                return null;
+        Stack<Board> stack = new Stack<>();
+
+        // find blank position
+        int blankRow = 0, blankCol = 0;
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (blocks[i][j] == 0) {
+                    blankRow = i;
+                    blankCol = j;
+                    break;
+                }
             }
-        };
+        }
+
+        // move blank position
+        if (blankRow - 1 >= 0) {
+            Board board = moveBlank(blankRow - 1, blankCol, blankRow, blankCol);
+            stack.push(board);
+        }
+        if (blankRow + 1 < dimension) {
+            Board board = moveBlank(blankRow + 1, blankCol, blankRow, blankCol);
+            stack.push(board);
+        }
+        if (blankCol - 1 >= 0) {
+            Board board = moveBlank(blankRow, blankCol - 1, blankRow, blankCol);
+            stack.push(board);
+        }
+        if (blankCol + 1 < dimension) {
+            Board board = moveBlank(blankRow, blankCol + 1, blankRow, blankCol);
+            stack.push(board);
+        }
+
+        return stack;
+    }
+
+    private Board moveBlank(int aRow, int aCol, int bRow, int bCol) {
+        int[][] movedBlocks = arrayCopy(this.blocks);
+        int tempVal = movedBlocks[aRow][aCol];
+        movedBlocks[aRow][aCol] = movedBlocks[bRow][bCol];
+        movedBlocks[bRow][bCol] = tempVal;
+
+        Board board = new Board(movedBlocks);
+        return board;
+    }
+
+    private int[][] arrayCopy(int[][] array) {
+        int n = array.length;
+        int[][] out = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++)
+                out[i][j] = array[i][j];
+        }
+        return out;
     }
 
     /**

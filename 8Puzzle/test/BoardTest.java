@@ -2,6 +2,8 @@ import edu.princeton.cs.algs4.In;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Iterator;
+
 class BoardTest {
 
     @Test
@@ -11,9 +13,13 @@ class BoardTest {
         Assertions.assertFalse(initial.isGoal());
 
         System.out.println(initial.toString());
-
+        Assertions.assertEquals(3, initial.dimension());
         Assertions.assertEquals(4, initial.hamming());
         Assertions.assertEquals(4, initial.manhattan());
+
+        Iterator<Board> iter = initial.neighbors().iterator();
+        while (iter.hasNext())
+            System.out.println(iter.next().toString());
     }
 
 
