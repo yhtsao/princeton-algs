@@ -1,6 +1,7 @@
 public class Board {
     private int dimension;
-    
+    private int blocks[][];
+
     /**
      * construct a board from an n-by-n array of blocks
      * (where blocks[i][j] = block in row i, column j)
@@ -9,8 +10,9 @@ public class Board {
      */
     public Board(int[][] blocks) {
         if (blocks == null || blocks.length == 0)
-            return null;
+            throw new IllegalArgumentException();
         this.dimension = blocks.length;
+        this.blocks = blocks;
     }
 
     /**
@@ -83,6 +85,13 @@ public class Board {
      * @return
      */
     public String toString() {
+        String str = dimension + "\n";
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                str = str + blocks[i][j] + " ";
+            }
+            str += "\n";
+        }
         return null;
     }
 }
