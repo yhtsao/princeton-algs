@@ -1,4 +1,8 @@
+import java.util.Arrays;
+import java.util.Iterator;
+
 public class Board {
+    private final int goalBlock[][];
     private int dimension;
     private int blocks[][];
 
@@ -13,6 +17,13 @@ public class Board {
             throw new IllegalArgumentException();
         this.dimension = blocks.length;
         this.blocks = blocks;
+
+        this.goalBlock = new int[dimension][dimension];
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++)
+                goalBlock[i][j] = i * dimension + j + 1;
+        }
+        goalBlock[dimension - 1][dimension - 1] = 0;
     }
 
     /**
@@ -25,12 +36,20 @@ public class Board {
     }
 
     /**
-     * number of blocks out of place
+     * number of blocks out of position
      *
      * @return
      */
     public int hamming() {
-        return 0;
+        int count = 0;
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (blocks[i][j] != goalBlock[i][j] && blocks[i][j] != 0) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     /**
@@ -39,7 +58,17 @@ public class Board {
      * @return
      */
     public int manhattan() {
-        return 0;
+        int count = 0;
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (blocks[i][j] != goalBlock[i][j] && blocks[i][j] != 0) {
+                    int correctRow = (blocks[i][j] - 1) / dimension;
+                    int correctCol = (blocks[i][j] - 1) % dimension;
+                    count += Math.abs(correctRow - i) + Math.abs(correctCol - j);
+                }
+            }
+        }
+        return count;
     }
 
     /**
@@ -48,7 +77,7 @@ public class Board {
      * @return
      */
     public boolean isGoal() {
-        return false;
+        return Arrays.equals(blocks, goalBlock);
     }
 
     /**
@@ -67,7 +96,11 @@ public class Board {
      * @return
      */
     public boolean equals(Object y) {
-        return false;
+        if (this == y) return true;
+        if (!(y instanceof Board)) return false;
+        Board board = (Board) y;
+        return dimension == board.dimension &&
+                Arrays.equals(blocks, board.blocks);
     }
 
     /**
@@ -76,7 +109,12 @@ public class Board {
      * @return
      */
     public Iterable<Board> neighbors() {
-        return null;
+        return new Iterable<Board>() {
+            @Override
+            public Iterator<Board> iterator() {
+                return null;
+            }
+        };
     }
 
     /**
@@ -92,6 +130,6 @@ public class Board {
             }
             str += "\n";
         }
-        return null;
+        return str;
     }
 }
