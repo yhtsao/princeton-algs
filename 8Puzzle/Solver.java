@@ -1,4 +1,11 @@
+import edu.princeton.cs.algs4.MinPQ;
+
 public class Solver {
+
+    private class SearchNode {
+        public Board current, predecessor;
+
+    }
 
     /**
      * find a solution to the initial board (using the A* algorithm)
@@ -8,6 +15,7 @@ public class Solver {
     public Solver(Board initial) {
         if (initial == null)
             throw new IllegalArgumentException();
+        MinPQ<Board> minPQ = new MinPQ<>();
     }
 
     /**
