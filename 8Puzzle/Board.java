@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.Stack;
 
 public class Board {
-    private final int goalBlock[][];
+
     private int dimension;
     private int blocks[][];
 
@@ -16,14 +16,11 @@ public class Board {
         if (blocks == null || blocks.length == 0)
             throw new IllegalArgumentException();
         this.dimension = blocks.length;
-        this.blocks = blocks;
 
-        this.goalBlock = new int[dimension][dimension];
+        this.blocks = new int[dimension][];
         for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++)
-                goalBlock[i][j] = i * dimension + j + 1;
+            this.blocks[i] = Arrays.copyOf(blocks[i], dimension);
         }
-        goalBlock[dimension - 1][dimension - 1] = 0;
     }
 
     /**
@@ -44,7 +41,7 @@ public class Board {
         int count = 0;
         for (int i = 0; i < dimension; i++) {
             for (int j = 0; j < dimension; j++) {
-                if (blocks[i][j] != goalBlock[i][j] && blocks[i][j] != 0) {
+                if (blocks[i][j] != i * dimension + j + 1 && !isBlank(i, j)) {
                     count++;
                 }
             }
@@ -61,7 +58,7 @@ public class Board {
         int count = 0;
         for (int i = 0; i < dimension; i++) {
             for (int j = 0; j < dimension; j++) {
-                if (blocks[i][j] != goalBlock[i][j] && blocks[i][j] != 0) {
+                if (blocks[i][j] != i * dimension + j + 1 && !isBlank(i, j)) {
                     int correctRow = (blocks[i][j] - 1) / dimension;
                     int correctCol = (blocks[i][j] - 1) % dimension;
                     count += Math.abs(correctRow - i) + Math.abs(correctCol - j);
@@ -71,13 +68,23 @@ public class Board {
         return count;
     }
 
+    private boolean isBlank(int row, int col) {
+        if (row < 0 || row >= dimension)
+            return true;
+        else if (col < 0 || col >= dimension)
+            return true;
+        else if (blocks[row][col] == 0)
+            return true;
+        return false;
+    }
+
     /**
      * is this board the goal board?
      *
      * @return
      */
     public boolean isGoal() {
-        return Arrays.equals(blocks, goalBlock);
+        return (hamming() == 0);
     }
 
     /**
@@ -86,8 +93,20 @@ public class Board {
      * @return
      */
     public Board twin() {
+        int[][] twinBlock = arrayCopy(blocks);
+
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (!isBlank(i, j) && !isBlank(i, j + 1)) {
+                    swapArrVal(twinBlock, i, j, i, j + 1);
+                    Board twinBoard = new Board(twinBlock);
+                    return twinBoard;
+                }
+            }
+        }
         return null;
     }
+
 
     /**
      * does this board equal y?
@@ -100,9 +119,17 @@ public class Board {
         if (!(y instanceof Board)) return false;
         Board board = (Board) y;
         return dimension == board.dimension &&
-                Arrays.equals(blocks, board.blocks);
+                isTwoDimArrayEqual(blocks, board.blocks);
     }
 
+    private boolean isTwoDimArrayEqual(int[][] a, int[][] b) {
+        for (int i = 0; i < a.length; i++) {
+            if (!Arrays.equals(a[i], b[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
     /**
      * all neighboring boards
      *
@@ -146,10 +173,7 @@ public class Board {
 
     private Board moveBlank(int aRow, int aCol, int bRow, int bCol) {
         int[][] movedBlocks = arrayCopy(this.blocks);
-        int tempVal = movedBlocks[aRow][aCol];
-        movedBlocks[aRow][aCol] = movedBlocks[bRow][bCol];
-        movedBlocks[bRow][bCol] = tempVal;
-
+        swapArrVal(movedBlocks, aRow, aCol, bRow, bCol);
         Board board = new Board(movedBlocks);
         return board;
     }
@@ -164,19 +188,26 @@ public class Board {
         return out;
     }
 
+    private void swapArrVal(int[][] arr, int row1, int col1, int row2, int col2) {
+        int temp = arr[row1][col1];
+        arr[row1][col1] = arr[row2][col2];
+        arr[row2][col2] = temp;
+    }
+
     /**
      * string representation of this board (in the output format specified below)
      *
      * @return
      */
     public String toString() {
-        String str = dimension + "\n";
+        StringBuilder s = new StringBuilder();
+        s.append(dimension + "\n");
         for (int i = 0; i < dimension; i++) {
             for (int j = 0; j < dimension; j++) {
-                str = str + blocks[i][j] + " ";
+                s.append(String.format("%2d ", blocks[i][j]));
             }
-            str += "\n";
+            s.append("\n");
         }
-        return str;
+        return s.toString();
     }
 }
