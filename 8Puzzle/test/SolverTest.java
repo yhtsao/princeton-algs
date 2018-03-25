@@ -1,11 +1,39 @@
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.Iterator;
 
 class SolverTest {
+
+    @Test
+    public void puzzle04() {
+        String filepath = "testcases/puzzle04.txt";
+        Board board = initBoardFromFile(filepath);
+        Solver solver = new Solver(board);
+        Assertions.assertTrue(solver.isSolvable());
+        Assertions.assertEquals(4, solver.moves());
+
+        Iterator<Board> solution = solver.solution().iterator();
+        while (solution.hasNext())
+            System.out.println(solution.next());
+    }
+
+    @Test
+    public void puzzle11() {
+        String filepath = "testcases/puzzle11.txt";
+        Board board = initBoardFromFile(filepath);
+        Solver solver = new Solver(board);
+        Assertions.assertTrue(solver.isSolvable());
+        Assertions.assertEquals(11, solver.moves());
+        System.out.println("Minimum number of moves = " + solver.moves());
+
+        for (Board tmp : solver.solution())
+            StdOut.println(tmp);
+    }
 
     @Test
     public void solvableCases() {
@@ -13,6 +41,7 @@ class SolverTest {
         for (int i = 0; i < 32; i++) {
             DecimalFormat formatter = new DecimalFormat("00");
             String filename = filenamePrefix + formatter.format(i) + ".txt";
+            System.out.println(filename);
             Board board = initBoardFromFile(filename);
             Solver solver = new Solver(board);
             Assertions.assertTrue(solver.isSolvable());

@@ -4,7 +4,7 @@ import java.util.Stack;
 public class Board {
 
     private int dimension;
-    private int blocks[][];
+    private int[][] blocks;
 
     /**
      * construct a board from an n-by-n array of blocks
@@ -116,7 +116,8 @@ public class Board {
      */
     public boolean equals(Object y) {
         if (this == y) return true;
-        if (!(y instanceof Board)) return false;
+        if (y == null) return false;
+        if (y.getClass() != Board.class) return false;
         Board board = (Board) y;
         return dimension == board.dimension &&
                 isTwoDimArrayEqual(blocks, board.blocks);
