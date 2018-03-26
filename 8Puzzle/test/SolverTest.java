@@ -57,6 +57,7 @@ class SolverTest {
             if (!file.getName().contains("unsolvable"))
                 continue;
             String filepath = dir.getName() + "/" + file.getName();
+            System.out.println(filepath);
             Board board = initBoardFromFile(filepath);
             Solver solver = new Solver(board);
             Assertions.assertFalse(solver.isSolvable());

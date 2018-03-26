@@ -43,9 +43,9 @@ public class Solver {
         }
     }
 
-    private MinPQ<SearchNode> minPQ;
     private Stack<Board> solution;
     private int moves;
+    private boolean isSolvable;
 
     /**
      * find a solution to the initial board (using the A* algorithm)
@@ -56,35 +56,59 @@ public class Solver {
         if (initial == null)
             throw new IllegalArgumentException();
 
-        this.minPQ = new MinPQ<>(new Comparator<SearchNode>() {
+
+
+        this.solution = new Stack<>();
+        this.moves = 0;
+        this.isSolvable = false;
+
+        solvePuzzle(initial);
+    }
+
+    private void solvePuzzle(Board init) {
+        // initial search node of input board
+        SearchNode primaryNode = new SearchNode(null, init, 0);
+        MinPQ<SearchNode> primaryMinPQ = new MinPQ<>(new Comparator<SearchNode>() {
             @Override
             public int compare(SearchNode o1, SearchNode o2) {
                 return o1.compareTo(o2);
             }
         });
 
-        this.solution = new Stack<>();
-        this.moves = 0;
+        // twin board for checking solvable
+        Board twinBoard = init.twin();
+        SearchNode twinNode = new SearchNode(null, twinBoard, 0);
+        MinPQ<SearchNode> twinMinPQ = new MinPQ<>(new Comparator<SearchNode>() {
+            @Override
+            public int compare(SearchNode o1, SearchNode o2) {
+                return o1.compareTo(o2);
+            }
+        });
 
-        solvePuzzle(initial);
+        while (!primaryNode.board.isGoal() && !twinNode.board.isGoal()) {
+            // do primary search
+            addNeighborToMinPQ(primaryNode, primaryMinPQ);
+            primaryNode = primaryMinPQ.delMin();
+
+            // do search for twin board
+            addNeighborToMinPQ(twinNode, twinMinPQ);
+            twinNode = twinMinPQ.delMin();
+        }
+
+        if (twinNode.board.isGoal()) {
+            isSolvable = false;
+            return;
+        }
+
+        this.isSolvable = true;
+        this.moves = primaryNode.moves;
+        while (primaryNode != null) {
+            solution.push(primaryNode.board);
+            primaryNode = primaryNode.predecessor;
+        }
     }
 
-    private void solvePuzzle(Board init) {
-        SearchNode searchNode = new SearchNode(null, init, 0);
-
-        while (!searchNode.board.isGoal()) {
-            addNeighborToMinPQ(searchNode);
-            searchNode = minPQ.delMin();
-        }
-        this.moves = searchNode.moves;
-
-        while (searchNode != null) {
-            solution.push(searchNode.board);
-            searchNode = searchNode.predecessor;
-        }
-    }
-
-    private void addNeighborToMinPQ(SearchNode current) {
+    private void addNeighborToMinPQ(SearchNode current, MinPQ<SearchNode> minPQ) {
         Board preBoard = null;
         if (current.predecessor != null)
             preBoard = current.predecessor.board;
@@ -105,7 +129,7 @@ public class Solver {
      * @return
      */
     public boolean isSolvable() {
-        return true;
+        return isSolvable;
     }
 
     /**
@@ -125,7 +149,10 @@ public class Solver {
      * @return
      */
     public Iterable<Board> solution() {
-        return solution;
+        if (isSolvable)
+            return solution;
+        else
+            return null;
     }
 
     public static void main(String[] args) {
