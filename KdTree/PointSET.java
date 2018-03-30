@@ -1,13 +1,18 @@
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
+import edu.princeton.cs.algs4.SET;
+
+import java.util.Iterator;
 
 public class PointSET {
+
+    private SET<Point2D> set;
 
     /**
      * construct an empty set of points
      */
     public PointSET() {
-
+        this.set = new SET<>();
     }
 
     /**
@@ -16,7 +21,7 @@ public class PointSET {
      * @return
      */
     public boolean isEmpty() {
-        return true;
+        return set.isEmpty();
     }
 
     /**
@@ -25,7 +30,7 @@ public class PointSET {
      * @return
      */
     public int size() {
-        return 0;
+        return set.size();
     }
 
     /**
@@ -34,7 +39,7 @@ public class PointSET {
      * @param p
      */
     public void insert(Point2D p) {
-
+        set.add(p);
     }
 
     /**
@@ -44,7 +49,7 @@ public class PointSET {
      * @return
      */
     public boolean contains(Point2D p) {
-        return false;
+        return set.contains(p);
     }
 
     /**
@@ -71,6 +76,17 @@ public class PointSET {
      * @return
      */
     public Point2D nearest(Point2D p) {
-        return null;
+        Iterator<Point2D> iter = set.iterator();
+        double min = 100;
+        Point2D nearestPoint = null;
+        while (iter.hasNext()) {
+            Point2D point = iter.next();
+            double d = p.distanceTo(point);
+            if (d < min) {
+                min = d;
+                nearestPoint = point;
+            }
+        }
+        return nearestPoint;
     }
 }
