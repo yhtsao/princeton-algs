@@ -1,6 +1,4 @@
-import edu.princeton.cs.algs4.Point2D;
-import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.SET;
+import edu.princeton.cs.algs4.*;
 
 import java.util.Iterator;
 
@@ -56,7 +54,9 @@ public class PointSET {
      * draw all points to standard draw
      */
     public void draw() {
-
+        for (Point2D p : set) {
+            StdDraw.point(p.x(), p.y());
+        }
     }
 
     /**
@@ -66,12 +66,17 @@ public class PointSET {
      * @return
      */
     public Iterable<Point2D> range(RectHV rect) {
-        return null;
+        Stack<Point2D> point2DStack = new Stack<>();
+        for (Point2D p : set) {
+            if (rect.contains(p))
+                point2DStack.push(p);
+        }
+        return point2DStack;
     }
 
     /**
      * a nearest neighbor in the set to point p; null if the set is empty
-     *
+     *6
      * @param p
      * @return
      */
