@@ -37,8 +37,8 @@ class KdTreeTest {
     }
 
     private void testNearest(PointSET brute, KdTree kdTree) {
-        Point2D randomPoint = new Point2D(StdRandom.uniform(0, 1), StdRandom.uniform(0, 1));
-        Assertions.assertEquals(brute.contains(randomPoint), kdTree.contains(randomPoint));
+        Point2D randomPoint = new Point2D(StdRandom.uniform(0.0, 1.0), StdRandom.uniform(0.0, 1.0));
+        Assertions.assertEquals(brute.nearest(randomPoint), kdTree.nearest(randomPoint));
     }
 
     private void testRangeContains(PointSET brute, KdTree kdTree) {
