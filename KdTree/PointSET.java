@@ -41,6 +41,7 @@ public class PointSET {
      * @param p
      */
     public void insert(Point2D p) {
+        if (p == null) throw new IllegalArgumentException();
         set.add(p);
     }
 
@@ -51,6 +52,7 @@ public class PointSET {
      * @return
      */
     public boolean contains(Point2D p) {
+        if (p == null) throw new IllegalArgumentException();
         return set.contains(p);
     }
 
@@ -70,6 +72,7 @@ public class PointSET {
      * @return
      */
     public Iterable<Point2D> range(RectHV rect) {
+        if (rect == null) throw new IllegalArgumentException();
         Stack<Point2D> point2DStack = new Stack<>();
         for (Point2D p : set) {
             if (rect.contains(p))
@@ -85,12 +88,13 @@ public class PointSET {
      * @return
      */
     public Point2D nearest(Point2D p) {
+        if (p == null) throw new IllegalArgumentException();
         Iterator<Point2D> iter = set.iterator();
         double min = 100;
         Point2D nearestPoint = null;
         while (iter.hasNext()) {
             Point2D point = iter.next();
-            double d = p.distanceTo(point);
+            double d = p.distanceSquaredTo(point);
             if (d < min) {
                 min = d;
                 nearestPoint = point;
