@@ -1,0 +1,25 @@
+    /**
+     * a nearest neighbor in the set to point p; null if the set is empty
+     *
+     * @param p
+     * @return
+     */
+    public Point2D nearest(Point2D p) {
+        if (p == null) throw new IllegalArgumentException();
+		if (root == null) return null;
+		
+        Node nearestNode = root;
+        double minDistance = nearestNode.p.distanceSquaredTo(p);
+		
+        while (nearestNode.lb != null || nearestNode.rt != null) {
+			if (nearestNode.lb != null && nearestNode.lb.p.distanceSquaredTo(p) < minDistance) {
+				minDistance = nearestNode.lb.p.distanceSquaredTo(p);
+                nearestNode = nearestNode.lb;
+			}
+			if (nearestNode.rt != null && nearestNode.rt.p.distanceSquaredTo(p) < minDistance) {
+				minDistance = nearestNode.rt.p.distanceSquaredTo(p);
+                nearestNode = nearestNode.rt;
+			}
+        }
+        return nearestNode.p;
+    }
