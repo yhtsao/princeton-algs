@@ -174,7 +174,7 @@ public class KdTree {
         return stack;
     }
 
-    private void findRange(Node node, RectHV rectHV, Stack stack) {
+    private void findRange(Node node, RectHV rectHV, Stack<Point2D> stack) {
         if (node == null)
             return;
 
@@ -197,7 +197,7 @@ public class KdTree {
      */
     public Point2D nearest(Point2D p) {
         if (p == null) throw new IllegalArgumentException();
-
+        if (root == null) return null;
         return nearest(root, p, root.p, true);
     }
 
