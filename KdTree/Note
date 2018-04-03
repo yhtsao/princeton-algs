@@ -1,25 +1,49 @@
-    /**
-     * a nearest neighbor in the set to point p; null if the set is empty
-     *
-     * @param p
-     * @return
-     */
-    public Point2D nearest(Point2D p) {
-        if (p == null) throw new IllegalArgumentException();
-		if (root == null) return null;
-		
-        Node nearestNode = root;
-        double minDistance = nearestNode.p.distanceSquaredTo(p);
-		
-        while (nearestNode.lb != null || nearestNode.rt != null) {
-			if (nearestNode.lb != null && nearestNode.lb.p.distanceSquaredTo(p) < minDistance) {
-				minDistance = nearestNode.lb.p.distanceSquaredTo(p);
-                nearestNode = nearestNode.lb;
-			}
-			if (nearestNode.rt != null && nearestNode.rt.p.distanceSquaredTo(p) < minDistance) {
-				minDistance = nearestNode.rt.p.distanceSquaredTo(p);
-                nearestNode = nearestNode.rt;
-			}
-        }
-        return nearestNode.p;
-    }
+public Point2D nearest(Point2D p) {
+if (p == null) throw new IllegalArgumentException();
+
+return nearest(root, p, root.p, true);
+}
+
+private Point2D nearest(Node node, Point2D p, Point2D minP, boolean isVertical) {
+if (node == null) return minP;
+
+System.out.println(node.p.toString());
+
+if (node.p.distanceSquaredTo(p) < minP.distanceSquaredTo(p))
+minP = node.p;
+
+if (isVertical) {
+if (p.x() < node.p.x()) {
+minP = nearest(node.lb, p, minP, !isVertical);
+
+if (node.rt != null && node.rt.rect.distanceSquaredTo(p) < minP.distanceSquaredTo(p)) {
+minP = nearest(node.rt, p, minP, !isVertical);
+}
+}
+else {
+minP = nearest(node.rt, p, minP, !isVertical);
+
+if (node.lb != null && node.lb.rect.distanceSquaredTo(p) < minP.distanceSquaredTo(p)) {
+minP = nearest(node.lb, p, minP, !isVertical);
+}
+}
+}
+else {
+if (p.y() < node.p.y()) {
+minP = nearest(node.lb, p, minP, !isVertical);
+
+if (node.rt != null && node.rt.rect.distanceSquaredTo(p) < minP.distanceSquaredTo(p)) {
+minP = nearest(node.rt, p, minP, !isVertical);
+}
+}
+else {
+minP = nearest(node.rt, p, minP, !isVertical);
+
+if (node.lb != null && node.lb.rect.distanceSquaredTo(p) < minP.distanceSquaredTo(p)) {
+minP = nearest(node.lb, p, minP, !isVertical);
+}
+}
+}
+
+return minP;
+}
