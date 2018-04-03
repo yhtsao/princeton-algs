@@ -154,10 +154,10 @@ public class KdTree {
         StdDraw.point(node.p.x(), node.p.y());
         if (isVertical) {
             StdDraw.setPenColor(StdDraw.RED);
-            StdDraw.line(node.p.x(), 0, node.p.x(), 1);
+            StdDraw.line(node.p.x(), node.rect.ymin(), node.p.x(), node.rect.ymax());
         } else {
             StdDraw.setPenColor(StdDraw.BLUE);
-            StdDraw.line(0, node.p.y(), 1, node.p.y());
+            StdDraw.line(node.rect.xmin(), node.p.y(), node.rect.xmax(), node.p.y());
         }
     }
 
@@ -198,30 +198,45 @@ public class KdTree {
     public Point2D nearest(Point2D p) {
         if (p == null) throw new IllegalArgumentException();
 
-        Node node = root;
-        double minDistance = 100;
-        Point2D nearestNode = null;
-        boolean isVertical = true;
-        while (node != null) {
-            double distance = p.distanceSquaredTo(node.p);
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestNode = node.p;
-            }
+        return nearest(root, p, root.p, true);
+    }
 
-            if (isVertical) {
-                if (p.x() < node.p.x())
-                    node = node.lb;
-                else
-                    node = node.rt;
+    private Point2D nearest(Node node, Point2D p, Point2D minP, boolean isVertical) {
+        if (node == null) return minP;
+
+        if (node.p.distanceSquaredTo(p) < minP.distanceSquaredTo(p))
+            minP = node.p;
+
+        if (isVertical) {
+            if (p.x() < node.p.x()) {
+                minP = nearest(node.lb, p, minP, !isVertical);
+
+                if (node.rt != null && node.rt.rect.distanceSquaredTo(p) < minP.distanceSquaredTo(p)) {
+                    minP = nearest(node.rt, p, minP, !isVertical);
+                }
             } else {
-                if (p.y() < node.p.y())
-                    node = node.lb;
-                else
-                    node = node.rt;
+                minP = nearest(node.rt, p, minP, !isVertical);
+
+                if (node.lb != null && node.lb.rect.distanceSquaredTo(p) < minP.distanceSquaredTo(p)) {
+                    minP = nearest(node.lb, p, minP, !isVertical);
+                }
             }
-            isVertical = !isVertical;
+        } else {
+            if (p.y() < node.p.y()) {
+                minP = nearest(node.lb, p, minP, !isVertical);
+
+                if (node.rt != null && node.rt.rect.distanceSquaredTo(p) < minP.distanceSquaredTo(p)) {
+                    minP = nearest(node.rt, p, minP, !isVertical);
+                }
+            } else {
+                minP = nearest(node.rt, p, minP, !isVertical);
+
+                if (node.lb != null && node.lb.rect.distanceSquaredTo(p) < minP.distanceSquaredTo(p)) {
+                    minP = nearest(node.lb, p, minP, !isVertical);
+                }
+            }
         }
-        return nearestNode;
+
+        return minP;
     }
 }

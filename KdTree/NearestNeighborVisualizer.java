@@ -20,7 +20,8 @@ public class NearestNeighborVisualizer {
     public static void main(String[] args) {
 
         // initialize the two data structures with point from file
-        String filename = args[0];
+        //String filename = args[0];
+        String filename = "testcases/input10.txt";
         In in = new In(filename);
         PointSET brute = new PointSET();
         KdTree kdtree = new KdTree();
@@ -50,12 +51,20 @@ public class NearestNeighborVisualizer {
             // draw in red the nearest neighbor (using brute-force algorithm)
             StdDraw.setPenRadius(0.03);
             StdDraw.setPenColor(StdDraw.RED);
-            brute.nearest(query).draw();
+            //brute.nearest(query).draw();
             StdDraw.setPenRadius(0.02);
 
             // draw in blue the nearest neighbor (using kd-tree algorithm)
             StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.setPenRadius(0.001);
             kdtree.nearest(query).draw();
+            kdtree.draw();
+
+
+            StdDraw.setPenColor(StdDraw.GREEN);
+            StdDraw.setPenRadius(0.01);
+            StdDraw.point(query.x(), query.y());
+
             StdDraw.show();
             StdDraw.pause(40);
         }
