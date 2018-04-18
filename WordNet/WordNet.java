@@ -20,6 +20,8 @@ public class WordNet {
      * is the word a WordNet noun?
      */
     public boolean isNoun(String word) {
+        if (word == null) throw new IllegalArgumentException();
+
         return false;
     }
 
@@ -27,6 +29,8 @@ public class WordNet {
      * distance between nounA and nounB (defined below)
      */
     public int distance(String nounA, String nounB) {
+        if (nounA == null || nounB == null) throw new IllegalArgumentException();
+
         return 0;
     }
 
@@ -39,6 +43,8 @@ public class WordNet {
      * @return
      */
     public String sap(String nounA, String nounB) {
+        if (nounA == null || nounB == null) throw new IllegalArgumentException();
+
         return null;
     }
 }
