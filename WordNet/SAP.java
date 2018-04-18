@@ -45,7 +45,7 @@ public class SAP {
         int sap = Integer.MAX_VALUE;
         for (int i = 0; i < G.V(); i++) {
             int path = bfsV.distTo(i) + bfsW.distTo(i);
-            if (path < sap && path > 0) {
+            if (path < sap && path >= 0) {
                 sap = path;
                 this.ancestor = i;
             }

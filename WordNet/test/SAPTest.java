@@ -12,6 +12,8 @@ class SAPTest {
         Digraph G = new Digraph(in);
         SAP sap = new SAP(G);
 
+        Assertions.assertEquals(0, sap.length(3, 3));
+
         Assertions.assertEquals(4, sap.length(3, 11));
         Assertions.assertEquals(1, sap.ancestor(3, 11));
 
