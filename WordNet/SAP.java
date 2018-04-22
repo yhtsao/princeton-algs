@@ -23,7 +23,6 @@ public class SAP {
         BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(G, v);
         BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(G, w);
         int minSmp = findShortestAncestor(bfsV, bfsW);
-
         return minSmp;
     }
 
