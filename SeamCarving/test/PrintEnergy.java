@@ -15,7 +15,14 @@ import edu.princeton.cs.algs4.StdOut;
 public class PrintEnergy {
 
     public static void main(String[] args) {
-        Picture picture = new Picture(args[0]);
+
+
+        Picture picture;
+        if (args != null && args.length != 0)
+            picture = new Picture(args[0]);
+        else
+            picture = new Picture("SeamCarving/testcases/3x4.png");
+
         StdOut.printf("image is %d pixels wide by %d pixels high.\n", picture.width(), picture.height());
 
         SeamCarver sc = new SeamCarver(picture);
