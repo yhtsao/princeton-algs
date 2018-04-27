@@ -1,9 +1,25 @@
 import edu.princeton.cs.algs4.Picture;
 
+import javax.jnlp.DownloadService;
+
 public class SeamCarver {
 
+    private class Pixel {
+        // energy of this pixel
+        double energy;
+
+        // parent vertex in shortest path
+        double parentX;
+        double parentY;
+
+        // shortest distance from source vertex
+        double distTo = Double.POSITIVE_INFINITY;
+    }
+
     private Picture picture;
-    private double[][] energy;
+    private int width, height;
+    //private double[][] energy;
+    private Pixel[][] pixels;
 
     /**
      * create a seam carver object based on the given picture
@@ -12,7 +28,10 @@ public class SeamCarver {
      */
     public SeamCarver(Picture picture) {
         this.picture = new Picture(picture);
-        this.energy = new double[picture.width()][picture.height()];
+        this.width = picture.width();
+        this.height = picture.height();
+
+        computeEnergyOfPicture();
     }
 
     /**
@@ -30,7 +49,7 @@ public class SeamCarver {
      * @return
      */
     public int width() {
-        return this.picture.width();
+        return this.width;
     }
 
     /**
@@ -39,7 +58,7 @@ public class SeamCarver {
      * @return
      */
     public int height() {
-        return this.picture.height();
+        return this.height;
     }
 
     /**
@@ -52,19 +71,26 @@ public class SeamCarver {
     public double energy(int x, int y) {
         if (x < 0 || x >= picture.width() || y < 0 || y >= picture.height())
             throw new IllegalArgumentException();
+        return pixels[x][y].energy;
+    }
 
-        if (energy[x][y] != 0) return energy[x][y];
+    private void computeEnergyOfPicture() {
+        pixels = new Pixel[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                pixels[x][y].energy = computeEnergy(x, y);
+            }
+        }
+    }
 
-        if (x == 0 || x == picture.width() - 1
-                || y == 0 || y == picture.height() - 1) {
-            energy[x][y] = 1000;
+    private double computeEnergy(int x, int y) {
+        if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+            return 1000;
         } else {
             double xGradient = getXGradient(x, y);
             double yGradient = getYGradient(x, y);
-            energy[x][y] = Math.sqrt(xGradient + yGradient);
+            return Math.sqrt(xGradient + yGradient);
         }
-
-        return energy[x][y];
     }
 
     private double getXGradient(int x, int y) {
@@ -116,7 +142,58 @@ public class SeamCarver {
      * @return
      */
     public int[] findVerticalSeam() {
+        double minDist = Double.POSITIVE_INFINITY;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                relax(x, y);
+
+
+            }
+        }
         return null;
+    }
+
+    private void relax(int x, int y) {
+        if (y + 1 > height) return;
+
+        if (isUpdateDistTo(pixels[x][y], pixels[x][y + 1])) {
+            pixels[x][y + 1].parentX = x;
+            pixels[x][y + 1].parentY = y;
+        }
+
+        if (x - 1 >= 0 && isUpdateDistTo(pixels[x][y], pixels[x - 1][y + 1])) {
+            pixels[x - 1][y + 1].parentX = x;
+            pixels[x - 1][y + 1].parentY = y;
+        }
+        if (x + 1 < width && isUpdateDistTo(pixels[x][y], pixels[x + 1][y + 1])) {
+            pixels[x + 1][y + 1].parentX = x;
+            pixels[x + 1][y + 1].parentY = y;
+        }
+
+        //if (pixels[x][y + 1].distTo > pixels[x][y].distTo + pixels[x][y + 1].energy)
+        //    pixels[x][y + 1].distTo = pixels[x][y].distTo + pixels[x][y + 1].energy;
+        //
+        //if (x - 1 >= 0 && pixels[x - 1][y + 1].distTo > pixels[x][y].distTo + pixels[x - 1][y + 1].energy)
+        //    pixels[x - 1][y + 1].distTo = pixels[x][y].distTo + pixels[x - 1][y + 1].energy;
+        //
+        //if (x + 1 < width && pixels[x + 1][y + 1].distTo > pixels[x][y].distTo + pixels[x + 1][y + 1].energy)
+        //    pixels[x + 1][y + 1].distTo = pixels[x][y].distTo + pixels[x + 1][y + 1].energy;
+
+    }
+
+    private boolean isUpdateDistTo(Pixel parent, Pixel child) {
+        if (child.distTo > parent.distTo + child.energy) {
+            child.distTo = parent.distTo + child.energy;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * compute shortest path by topological order
+     */
+    private void findSeam() {
+
     }
 
     /**

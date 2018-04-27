@@ -15,8 +15,6 @@ import edu.princeton.cs.algs4.StdOut;
 public class PrintEnergy {
 
     public static void main(String[] args) {
-
-
         Picture picture;
         if (args != null && args.length != 0)
             picture = new Picture(args[0]);
