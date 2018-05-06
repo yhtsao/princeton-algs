@@ -67,8 +67,8 @@ class SeamCarverTest {
 
         Assertions.assertEquals(2530.6820, getEnergyOfSeam(carver, horizontalSeam, HORIZONTAL));
 
-        carver.removeVerticalSeam(verticalSeam);
-        System.out.println(carver.picture().toString());
+        //carver.removeVerticalSeam(verticalSeam);
+        //System.out.println(carver.picture().toString());
 
         //carver.removeHorizontalSeam(horizontalSeam);
         //System.out.println(carver.picture().toString());

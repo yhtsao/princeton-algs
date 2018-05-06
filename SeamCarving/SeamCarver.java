@@ -1,24 +1,11 @@
 import edu.princeton.cs.algs4.Picture;
 
 import java.awt.Color;
+import java.util.Arrays;
 
 public class SeamCarver {
-
-    private class Pixel {
-        // energy of this pixel
-        double energy;
-
-        // parent vertex in shortest path
-        int edgeTo;
-
-        // shortest distance from source vertex
-        double distTo = Double.POSITIVE_INFINITY;
-    }
-
     private Picture picture;
-    //private double[][] energy;
-    private Pixel[][] pixels;
-    private Pixel[][] transposedPixels;
+    private double[][] energy;
 
     /**
      * create a seam carver object based on the given picture
@@ -26,8 +13,10 @@ public class SeamCarver {
      * @param picture
      */
     public SeamCarver(Picture picture) {
-        this.picture = new Picture(picture);
+        if (picture == null)
+            throw new IllegalArgumentException();
 
+        this.picture = new Picture(picture);
         computeEnergyOfPicture();
     }
 
@@ -66,21 +55,16 @@ public class SeamCarver {
      * @return
      */
     public double energy(int x, int y) {
-        if (x < 0 || x >= picture.width() || y < 0 || y >= picture.height())
+        if (x < 0 || x >= width() || y < 0 || y >= height())
             throw new IllegalArgumentException();
-        return pixels[x][y].energy;
+        return energy[x][y];
     }
 
     private void computeEnergyOfPicture() {
-        pixels = new Pixel[width()][height()];
-        transposedPixels = new Pixel[height()][width()];
+        energy = new double[width()][height()];
         for (int x = 0; x < width(); x++) {
             for (int y = 0; y < height(); y++) {
-                pixels[x][y] = new Pixel();
-                pixels[x][y].energy = computeEnergy(x, y);
-
-                transposedPixels[y][x] = new Pixel();
-                transposedPixels[y][x].energy = pixels[x][y].energy;
+                energy[x][y] = computeEnergy(x, y);
             }
         }
     }
@@ -135,83 +119,78 @@ public class SeamCarver {
      * @return
      */
     public int[] findHorizontalSeam() {
-        for (int y = 0; y < width() - 1; y++) {
-            for (int x = 0; x < height(); x++) {
-                relax(transposedPixels, x, y);
-            }
-        }
-
-        int minX = 0;
-        double minDist = Double.POSITIVE_INFINITY;
-        for (int x = 0; x < height(); x++) {
-            if (transposedPixels[x][width() - 1].distTo < minDist) {
-                minDist = transposedPixels[x][width() - 1].distTo;
-                minX = x;
-            }
-        }
-
-        int[] seam = new int[width()];
-        for (int i = width() - 1; i >= 0; i--) {
-            seam[i] = minX;
-            minX = transposedPixels[minX][i].edgeTo;
-        }
-        return seam;
-    }
-
-    /**
-     * sequence of indices for vertical seam
-     *
-     * @return
-     */
-    public int[] findVerticalSeam() {
-        for (int y = 0; y < height() - 1; y++) {
-            for (int x = 0; x < width(); x++) {
-                relax(pixels, x, y);
-            }
-        }
-
-        int minX = 0;
-        double minDist = Double.POSITIVE_INFINITY;
+        /* transpose the energy array */
+        double[][] transposedEnergy = new double[height()][width()];
         for (int x = 0; x < width(); x++) {
-            if (pixels[x][height() - 1].distTo < minDist) {
-                minDist = pixels[x][height() - 1].distTo;
-                minX = x;
+            for (int y = 0; y < height(); y++)
+                transposedEnergy[y][x] = energy[x][y];
+        }
+        return findSeam(transposedEnergy, height(), width());
+    }
+
+    public int[] findVerticalSeam() {
+        return findSeam(energy, width(), height());
+    }
+
+    private int[] findSeam(double[][] energy, int width, int height) {
+         /* initialize distTo and edgeTo array */
+        int[][] edgeTo = new int[width][height];
+        double[][] distTo = new double[width][height];
+        for (int x = 0; x < width; x++)
+            Arrays.fill(distTo[x], Double.POSITIVE_INFINITY);
+
+        for (int y = 0; y < height - 1; y++) {
+            for (int x = 0; x < width; x++) {
+                relax(energy, edgeTo, distTo, x, y);
             }
         }
+        /* get seam from distTo and edgeTo */
+        int[] seam = getSeam(edgeTo, distTo, width, height);
 
-        int[] seam = new int[height()];
-        for (int i = height() - 1; i >= 0; i--) {
-            seam[i] = minX;
-            minX = pixels[minX][i].edgeTo;
-        }
         return seam;
     }
 
-    private void relax(Pixel[][] array, int x, int y) {
-        if (y + 1 > array[0].length) return;
+    private void relax(double[][] energy, int[][] edgeTo, double[][] distTo, int x, int y) {
+        if (y + 1 > energy[0].length) return;
 
         if (y == 0) {
-            array[x][y].distTo = array[x][y].energy;
+            distTo[x][y] = energy[x][y];
         }
 
-        if (isUpdateDistTo(array[x][y], array[x][y + 1])) {
-            array[x][y + 1].edgeTo = x;
+        if (distTo[x][y + 1] > energy[x][y + 1] + distTo[x][y]) {
+            edgeTo[x][y + 1] = x;
+            distTo[x][y + 1] = energy[x][y + 1] + distTo[x][y];
         }
 
-        if (x - 1 >= 0 && isUpdateDistTo(array[x][y], array[x - 1][y + 1])) {
-            array[x - 1][y + 1].edgeTo = x;
+        if (x - 1 >= 0 && distTo[x - 1][y + 1] > energy[x - 1][y + 1] + distTo[x][y]) {
+            edgeTo[x - 1][y + 1] = x;
+            distTo[x - 1][y + 1] = energy[x - 1][y + 1] + distTo[x][y];
         }
-        if (x + 1 < array.length && isUpdateDistTo(array[x][y], array[x + 1][y + 1])) {
-            array[x + 1][y + 1].edgeTo = x;
+
+        if (x + 1 < energy.length && distTo[x + 1][y + 1] > energy[x + 1][y + 1] + distTo[x][y]) {
+            edgeTo[x + 1][y + 1] = x;
+            distTo[x + 1][y + 1] = energy[x + 1][y + 1] + distTo[x][y];
         }
     }
 
-    private boolean isUpdateDistTo(Pixel parent, Pixel child) {
-        if (child.distTo > parent.distTo + child.energy) {
-            child.distTo = parent.distTo + child.energy;
-            return true;
+    private int[] getSeam(int[][] edgeTo, double[][] distTo, int width, int height) {
+        /* find minimum distance vertex */
+        int minX = 0;
+        double minDist = Double.POSITIVE_INFINITY;
+        for (int x = 0; x < width; x++) {
+            if (distTo[x][height - 1] < minDist) {
+                minDist = distTo[x][height - 1];
+                minX = x;
+            }
         }
-        return false;
+
+        /* get path from vertex with minimum distance to top */
+        int[] seam = new int[height];
+        for (int i = height - 1; i >= 0; i--) {
+            seam[i] = minX;
+            minX = edgeTo[minX][i];
+        }
+        return seam;
     }
 
     /**
