@@ -1,6 +1,6 @@
 import edu.princeton.cs.algs4.Picture;
 
-import javax.jnlp.DownloadService;
+import java.awt.Color;
 
 public class SeamCarver {
 
@@ -9,17 +9,16 @@ public class SeamCarver {
         double energy;
 
         // parent vertex in shortest path
-        double parentX;
-        double parentY;
+        int edgeTo;
 
         // shortest distance from source vertex
         double distTo = Double.POSITIVE_INFINITY;
     }
 
     private Picture picture;
-    private int width, height;
     //private double[][] energy;
     private Pixel[][] pixels;
+    private Pixel[][] transposedPixels;
 
     /**
      * create a seam carver object based on the given picture
@@ -28,8 +27,6 @@ public class SeamCarver {
      */
     public SeamCarver(Picture picture) {
         this.picture = new Picture(picture);
-        this.width = picture.width();
-        this.height = picture.height();
 
         computeEnergyOfPicture();
     }
@@ -40,7 +37,7 @@ public class SeamCarver {
      * @return
      */
     public Picture picture() {
-        return picture;
+        return new Picture(picture);
     }
 
     /**
@@ -49,7 +46,7 @@ public class SeamCarver {
      * @return
      */
     public int width() {
-        return this.width;
+        return picture.width();
     }
 
     /**
@@ -58,7 +55,7 @@ public class SeamCarver {
      * @return
      */
     public int height() {
-        return this.height;
+        return picture.height();
     }
 
     /**
@@ -75,16 +72,21 @@ public class SeamCarver {
     }
 
     private void computeEnergyOfPicture() {
-        pixels = new Pixel[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        pixels = new Pixel[width()][height()];
+        transposedPixels = new Pixel[height()][width()];
+        for (int x = 0; x < width(); x++) {
+            for (int y = 0; y < height(); y++) {
+                pixels[x][y] = new Pixel();
                 pixels[x][y].energy = computeEnergy(x, y);
+
+                transposedPixels[y][x] = new Pixel();
+                transposedPixels[y][x].energy = pixels[x][y].energy;
             }
         }
     }
 
     private double computeEnergy(int x, int y) {
-        if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+        if (x == 0 || x == width() - 1 || y == 0 || y == height() - 1) {
             return 1000;
         } else {
             double xGradient = getXGradient(x, y);
@@ -133,7 +135,27 @@ public class SeamCarver {
      * @return
      */
     public int[] findHorizontalSeam() {
-        return null;
+        for (int y = 0; y < width() - 1; y++) {
+            for (int x = 0; x < height(); x++) {
+                relax(transposedPixels, x, y);
+            }
+        }
+
+        int minX = 0;
+        double minDist = Double.POSITIVE_INFINITY;
+        for (int x = 0; x < height(); x++) {
+            if (transposedPixels[x][width() - 1].distTo < minDist) {
+                minDist = transposedPixels[x][width() - 1].distTo;
+                minX = x;
+            }
+        }
+
+        int[] seam = new int[width()];
+        for (int i = width() - 1; i >= 0; i--) {
+            seam[i] = minX;
+            minX = transposedPixels[minX][i].edgeTo;
+        }
+        return seam;
     }
 
     /**
@@ -142,43 +164,46 @@ public class SeamCarver {
      * @return
      */
     public int[] findVerticalSeam() {
-        double minDist = Double.POSITIVE_INFINITY;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                relax(x, y);
-
-
+        for (int y = 0; y < height() - 1; y++) {
+            for (int x = 0; x < width(); x++) {
+                relax(pixels, x, y);
             }
         }
-        return null;
+
+        int minX = 0;
+        double minDist = Double.POSITIVE_INFINITY;
+        for (int x = 0; x < width(); x++) {
+            if (pixels[x][height() - 1].distTo < minDist) {
+                minDist = pixels[x][height() - 1].distTo;
+                minX = x;
+            }
+        }
+
+        int[] seam = new int[height()];
+        for (int i = height() - 1; i >= 0; i--) {
+            seam[i] = minX;
+            minX = pixels[minX][i].edgeTo;
+        }
+        return seam;
     }
 
-    private void relax(int x, int y) {
-        if (y + 1 > height) return;
+    private void relax(Pixel[][] array, int x, int y) {
+        if (y + 1 > array[0].length) return;
 
-        if (isUpdateDistTo(pixels[x][y], pixels[x][y + 1])) {
-            pixels[x][y + 1].parentX = x;
-            pixels[x][y + 1].parentY = y;
+        if (y == 0) {
+            array[x][y].distTo = array[x][y].energy;
         }
 
-        if (x - 1 >= 0 && isUpdateDistTo(pixels[x][y], pixels[x - 1][y + 1])) {
-            pixels[x - 1][y + 1].parentX = x;
-            pixels[x - 1][y + 1].parentY = y;
-        }
-        if (x + 1 < width && isUpdateDistTo(pixels[x][y], pixels[x + 1][y + 1])) {
-            pixels[x + 1][y + 1].parentX = x;
-            pixels[x + 1][y + 1].parentY = y;
+        if (isUpdateDistTo(array[x][y], array[x][y + 1])) {
+            array[x][y + 1].edgeTo = x;
         }
 
-        //if (pixels[x][y + 1].distTo > pixels[x][y].distTo + pixels[x][y + 1].energy)
-        //    pixels[x][y + 1].distTo = pixels[x][y].distTo + pixels[x][y + 1].energy;
-        //
-        //if (x - 1 >= 0 && pixels[x - 1][y + 1].distTo > pixels[x][y].distTo + pixels[x - 1][y + 1].energy)
-        //    pixels[x - 1][y + 1].distTo = pixels[x][y].distTo + pixels[x - 1][y + 1].energy;
-        //
-        //if (x + 1 < width && pixels[x + 1][y + 1].distTo > pixels[x][y].distTo + pixels[x + 1][y + 1].energy)
-        //    pixels[x + 1][y + 1].distTo = pixels[x][y].distTo + pixels[x + 1][y + 1].energy;
-
+        if (x - 1 >= 0 && isUpdateDistTo(array[x][y], array[x - 1][y + 1])) {
+            array[x - 1][y + 1].edgeTo = x;
+        }
+        if (x + 1 < array.length && isUpdateDistTo(array[x][y], array[x + 1][y + 1])) {
+            array[x + 1][y + 1].edgeTo = x;
+        }
     }
 
     private boolean isUpdateDistTo(Pixel parent, Pixel child) {
@@ -190,21 +215,27 @@ public class SeamCarver {
     }
 
     /**
-     * compute shortest path by topological order
-     */
-    private void findSeam() {
-
-    }
-
-    /**
      * remove horizontal seam from current picture
      *
      * @param seam
      */
     public void removeHorizontalSeam(int[] seam) {
-        if (seam == null || seam.length == 0)
+        if (!isValidSeam(seam, false))
             throw new IllegalArgumentException();
-        if (picture.height() <= 1) throw new IllegalArgumentException();
+
+        int x = 0;
+        Picture newPicture = new Picture(width(), height() - 1);
+        for (int removedPixel : seam) {
+            int newY = 0;
+            for (int y = 0; y < height(); y++) {
+                if (y == removedPixel) continue;
+                Color color = picture.get(x, y);
+                newPicture.set(x, newY++, color);
+            }
+            x++;
+        }
+        this.picture = newPicture;
+        computeEnergyOfPicture();
     }
 
     /**
@@ -213,8 +244,36 @@ public class SeamCarver {
      * @param seam
      */
     public void removeVerticalSeam(int[] seam) {
-        if (seam == null || seam.length == 0)
+        if (!isValidSeam(seam, true))
             throw new IllegalArgumentException();
-        if (picture.width() <= 1) throw new IllegalArgumentException();
+
+        int y = 0;
+        Picture newPicture = new Picture(width() - 1, height());
+        for (int removedPixel : seam) {
+            int newX = 0;
+            for (int x = 0; x < width(); x++) {
+                if (x == removedPixel) continue;
+                Color color = picture.get(x, y);
+                newPicture.set(newX++, y, color);
+            }
+            y++;
+        }
+        this.picture = newPicture;
+        computeEnergyOfPicture();
+    }
+
+    private boolean isValidSeam(int[] seam, boolean isVertical) {
+        if (picture == null || seam == null || seam.length == 0)
+            return false;
+        if (isVertical && (picture.width() <= 1 || seam.length != height()))
+            return false;
+        else if (!isVertical && (picture.height() <= 1 || seam.length != width()))
+            return false;
+
+        for (int i = 0; i < seam.length - 1; i++) {
+            if (Math.abs(seam[i] - seam[i + 1]) > 1)
+                return false;
+        }
+        return true;
     }
 }
