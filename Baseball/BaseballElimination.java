@@ -26,13 +26,12 @@ public class BaseballElimination {
         }
     }
 
-    private class FlowVertex {
-        int vertex;
-        int team, team1, team2;
+    private class Vertex {
+        Team team, team1, team2;
     }
 
-    private Map<String, Team> teamToDetailMap;
-    private List<String> teamList;
+    private Map<String, Team> teamToStatusMap;
+    private String[] teamList;
     private int numOfTeam;
 
     /**
@@ -47,27 +46,29 @@ public class BaseballElimination {
 
         for (int i = 0; i < numberOfTeams(); i++) {
             buildFlowNetworkAndFindMinCut(i);
+
         }
     }
 
     private void readTeamDetailFromFile(String filename) {
         In in = new In(filename);
         numOfTeam = in.readInt();
-        teamList = new ArrayList<>();
-        teamToDetailMap = new HashMap<>();
+        teamList = new String[numOfTeam];
+        teamToStatusMap = new HashMap<>();
         for (int i = 0; i < numOfTeam; i++) {
+            // read {team, win, loss, remain}
             Team team = new Team(in.readString(), in.readInt(), in.readInt(), in.readInt());
             team.game = new int[numOfTeam];
             for (int j = 0; j < numOfTeam; j++) {
                 team.game[j] = in.readInt();
             }
-            teamList.add(team.name);
-            teamToDetailMap.put(team.name, team);
+            teamList[i] = team.name;
+            teamToStatusMap.put(team.name, team);
         }
     }
 
-    private FlowNetwork buildFlowNetworkAndFindMinCut(int teamIndex) {
-        if (isTrivialCase(teamIndex)) return null;
+    private void buildFlowNetworkAndFindMinCut(int eliminatedTeamIndex) {
+        if (isTrivialCase(eliminatedTeamIndex)) return;
 
         int numOfGameVertices = Combination.exec(numOfTeam - 1, 2);
         int numOfTeamVertices = numOfTeam - 1;
@@ -75,50 +76,50 @@ public class BaseballElimination {
         int s = 0, t = totalNumberOfVertices - 1;
 
         FlowNetwork flowNetwork = new FlowNetwork(totalNumberOfVertices);
-        FlowVertex[] flowVertexs = new FlowVertex[totalNumberOfVertices];
+        Vertex[] vertices = new Vertex[totalNumberOfVertices];
 
+        // initialize team vertices
         for (int i = 0, j = 1; i < numOfTeam; i++) {
-            if (i == teamIndex) continue;
-            FlowVertex flowVertex = new FlowVertex();
-            flowVertex.team = i;
-            flowVertexs[numOfGameVertices + j] = flowVertex;
+            if (i == eliminatedTeamIndex) continue;
+            Vertex vertex = new Vertex();
+            vertex.team = teamToStatusMap.get(teamList[i]);
+            vertices[numOfGameVertices + j] = vertex;
             j++;
         }
 
-        int currentIndex = 1;
-        // build source to game vertices edges
+        int gameVerticesIndex = 1;
         for (int i = 0; i < numOfTeam; i++) {
-            if (i == teamIndex) continue;
+            if (i == eliminatedTeamIndex) continue;
 
             for (int j = i + 1; j < numOfTeam; j++) {
-                if (j == teamIndex) continue;
+                if (j == eliminatedTeamIndex) continue;
 
-                // build source to game vertices edges
-                FlowVertex flowVertex = new FlowVertex();
-                flowVertex.team1 = i;
-                flowVertex.team2 = j;
+                // build edges from source to game vertices
+                Vertex vertex = new Vertex();
+                vertex.team1 = teamToStatusMap.get(teamList[i]);
+                vertex.team2 = teamToStatusMap.get(teamList[j]);
+                vertices[gameVerticesIndex] = vertex;
 
-                flowVertexs[currentIndex] = flowVertex;
-
-                FlowEdge flowEdge = new FlowEdge(s, currentIndex, teamToDetailMap.get(teamList.get(i)).game[j]);
+                FlowEdge flowEdge = new FlowEdge(s, gameVerticesIndex, vertex.team1.game[j]);
                 flowNetwork.addEdge(flowEdge);
 
-                // build game to team vertices edges
+                // build edges from game to team vertices
                 for (int k = numOfGameVertices + 1; k < totalNumberOfVertices - 1; k++) {
-                    if (flowVertexs[k].team == flowVertex.team1 || flowVertexs[k].team == flowVertex.team2) {
-                        flowEdge = new FlowEdge(currentIndex, k, Double.POSITIVE_INFINITY);
+                    if (vertices[k].team.name.equals(vertex.team1.name)
+                            || vertices[k].team.name.equals(vertex.team2.name)) {
+                        flowEdge = new FlowEdge(gameVerticesIndex, k, Double.POSITIVE_INFINITY);
                         flowNetwork.addEdge(flowEdge);
                     }
                 }
-                currentIndex++;
+                gameVerticesIndex++;
             }
         }
 
-        // build team vertices to target edges
-        Team givenTeam = teamToDetailMap.get(teamList.get(teamIndex));
+        // build team vertices to target vertex
+        Team givenTeam = teamToStatusMap.get(teamList[eliminatedTeamIndex]);
         double maxWinOfGivenTeam = givenTeam.win + givenTeam.remain;
         for (int i = numOfGameVertices + 1; i < totalNumberOfVertices - 1; i++) {
-            double capacity = maxWinOfGivenTeam - teamToDetailMap.get(teamList.get(flowVertexs[i].team)).win;
+            double capacity = maxWinOfGivenTeam - vertices[i].team.win;
             if (capacity < 0) capacity = 0;
             FlowEdge flowEdge = new FlowEdge(i, t, capacity);
             flowNetwork.addEdge(flowEdge);
@@ -127,28 +128,31 @@ public class BaseballElimination {
         // compute maximum flow and minimum cut
         FordFulkerson maxflow = new FordFulkerson(flowNetwork, s, t);
 
-        // check if edges from source to game vertices is full
+        /**
+         * Check if given team is eliminated by checking each edge from source to game vertices is full
+         * if there exists one edge is not full, means that given team is eliminated
+         * if it's eliminated, find all team vertices on source side as certificate team
+         */
         for (FlowEdge e : flowNetwork.adj(s)) {
             if ((s == e.from()) && e.flow() != e.capacity()) {
                 givenTeam.isEliminated = true;
                 givenTeam.certificateOfElimination = new ArrayList<>();
                 for (int v = numOfGameVertices + 1; v < totalNumberOfVertices - 1; v++) {
                     if (maxflow.inCut(v)) {
-                        String certificateTeam = teamList.get(flowVertexs[v].team);
+                        String certificateTeam = vertices[v].team.name;
                         givenTeam.certificateOfElimination.add(certificateTeam);
                     }
                 }
                 break;
             }
         }
-        return null;
     }
 
-    private boolean isTrivialCase(int teamIndex) {
-        Team givenTeam = teamToDetailMap.get(teamList.get(teamIndex));
+    private boolean isTrivialCase(int eliminatedTeamIndex) {
+        Team givenTeam = teamToStatusMap.get(teamList[eliminatedTeamIndex]);
         for (int i = 0; i < numberOfTeams(); i++) {
-            if (i == teamIndex) continue;
-            Team otherTeam = teamToDetailMap.get(teamList.get(i));
+            if (i == eliminatedTeamIndex) continue;
+            Team otherTeam = teamToStatusMap.get(teamList[i]);
             if (givenTeam.win + givenTeam.remain < otherTeam.win) {
                 givenTeam.isEliminated = true;
                 givenTeam.certificateOfElimination = new ArrayList<>();
@@ -174,7 +178,7 @@ public class BaseballElimination {
      * @return
      */
     public Iterable<String> teams() {
-        return teamToDetailMap.keySet();
+        return teamToStatusMap.keySet();
     }
 
     /**
@@ -185,7 +189,7 @@ public class BaseballElimination {
      */
     public int wins(String team) {
         if (!isValidTeam(team)) throw new IllegalArgumentException();
-        return teamToDetailMap.get(team).win;
+        return teamToStatusMap.get(team).win;
     }
 
     /**
@@ -196,7 +200,7 @@ public class BaseballElimination {
      */
     public int losses(String team) {
         if (!isValidTeam(team)) throw new IllegalArgumentException();
-        return teamToDetailMap.get(team).loss;
+        return teamToStatusMap.get(team).loss;
     }
 
     /**
@@ -207,7 +211,7 @@ public class BaseballElimination {
      */
     public int remaining(String team) {
         if (!isValidTeam(team)) throw new IllegalArgumentException();
-        return teamToDetailMap.get(team).remain;
+        return teamToStatusMap.get(team).remain;
     }
 
     /**
@@ -220,9 +224,9 @@ public class BaseballElimination {
     public int against(String team1, String team2) {
         if (!isValidTeam(team1) || !isValidTeam(team2))
             throw new IllegalArgumentException();
-        for (int i = 0; i < teamList.size(); i++) {
-            if (teamList.get(i).equals(team2))
-                return teamToDetailMap.get(team1).game[i];
+        for (int i = 0; i < numOfTeam; i++) {
+            if (teamList[i].equals(team2))
+                return teamToStatusMap.get(team1).game[i];
         }
         return 0;
     }
@@ -235,7 +239,7 @@ public class BaseballElimination {
      */
     public boolean isEliminated(String team) {
         if (!isValidTeam(team)) throw new IllegalArgumentException();
-        return teamToDetailMap.get(team).isEliminated;
+        return teamToStatusMap.get(team).isEliminated;
     }
 
     /**
@@ -246,11 +250,11 @@ public class BaseballElimination {
      */
     public Iterable<String> certificateOfElimination(String team) {
         if (!isValidTeam(team)) throw new IllegalArgumentException();
-        return teamToDetailMap.get(team).certificateOfElimination;
+        return teamToStatusMap.get(team).certificateOfElimination;
     }
 
     private boolean isValidTeam(String team) {
-        if (team == null || teamToDetailMap.get(team) == null)
+        if (team == null || teamToStatusMap.get(team) == null)
             return false;
         return true;
     }
