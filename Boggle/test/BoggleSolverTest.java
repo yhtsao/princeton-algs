@@ -59,13 +59,21 @@ class BoggleSolverTest {
 
     @Test
     public void trieTest() {
-        In in = new In("testcases/dictionary-algs4.txt");
+        In in = new In("testcases/dictionary-zingarelli2005.txt");
         String[] dictionary = in.readAllStrings();
-        Trie<Integer> tst = new Trie<>();
+        Trie<Integer> trie = new Trie<>();
         for (String word : dictionary) {
-            tst.put(word, 0);
+            trie.put(word, 0);
         }
-        StdOut.println(tst.contains("WALKED"));
+        StdOut.println(trie.contains("WALKED"));
+        long start = System.currentTimeMillis();
+        for (String word : dictionary) {
+            Assertions.assertNotNull(trie.getNonRecursive(word));
+            //Assertions.assertNotNull(trie.get(word));
+        }
+        long end = System.currentTimeMillis();
+        StdOut.println((end - start));
+
     }
 
     @Test

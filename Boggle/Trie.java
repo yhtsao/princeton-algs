@@ -1,7 +1,9 @@
+import edu.princeton.cs.algs4.StdOut;
+
 public class Trie<Value> {
     private static final int R = 26;        // extended ASCII
 
-    private TrieNode root;      // root of trie
+    public TrieNode root;      // root of trie
     private int n;          // number of keys in trie
 
     /**
@@ -38,12 +40,35 @@ public class Trie<Value> {
         return get(key) != null;
     }
 
-    private TrieNode get(TrieNode x, String key, int d) {
+    public TrieNode get(TrieNode x, String key, int d) {
         if (x == null) return null;
         if (d == key.length()) return x;
         char c = key.charAt(d);
         int position = c - 'A';
         return get(x.next[position], key, d + 1);
+    }
+
+    public Value getNonRecursive(String key) {
+        if (key == null) throw new IllegalArgumentException("argument to get() is null");
+
+        TrieNode x = getNonRecursive(root, key, 0);
+        if (x == null) return null;
+        return (Value) x.val;
+    }
+
+    public TrieNode getNonRecursive(TrieNode x, String key, int d) {
+        if (x == null) return null;
+        TrieNode nextNode = x;
+        for (; d < key.length(); d++) {
+            char c = key.charAt(d);
+            int position = c - 'A';
+            if (nextNode.next[position] == null) {
+                nextNode = null;
+                break;
+            }
+            nextNode = nextNode.next[position];
+        }
+        return nextNode;
     }
 
     /**

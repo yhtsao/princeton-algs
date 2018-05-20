@@ -8,7 +8,7 @@ import java.util.Set;
 public class BoggleSolver {
 
     private Set<String> validWord;
-    private Trie<Integer> dictionarySet;
+    private Trie<Integer> trie;
 
     /**
      * Initializes the data structure using the given array of strings as the dictionary.
@@ -17,9 +17,9 @@ public class BoggleSolver {
      * @param dictionary
      */
     public BoggleSolver(String[] dictionary) {
-        this.dictionarySet = new Trie<>();
+        this.trie = new Trie<>();
         for (String word : dictionary) {
-            dictionarySet.put(word, 0);
+            trie.put(word, 0);
         }
         this.validWord = new HashSet<>();
     }
@@ -35,12 +35,12 @@ public class BoggleSolver {
 
         this.validWord = new HashSet<>();
 
-        dfs(board);
+        runDfsToFindAllValidWord(board);
 
         return this.validWord;
     }
 
-    private void dfs(BoggleBoard board) {
+    private void runDfsToFindAllValidWord(BoggleBoard board) {
         boolean[][] isMarked = new boolean[board.rows()][board.cols()];
         for (int i = 0; i < board.rows(); i++) {
             Arrays.fill(isMarked[i], false);
@@ -48,57 +48,46 @@ public class BoggleSolver {
 
         for (int i = 0; i < board.rows(); i++) {
             for (int j = 0; j < board.cols(); j++) {
-                dfs(board, i, j, isMarked, "");
+                dfs(board, i, j, isMarked, "", trie.root);
             }
         }
-
     }
 
-    private void dfs(BoggleBoard board, int row, int col, boolean[][] isMarked, String prefix) {
+    private void dfs(BoggleBoard board, int row, int col, boolean[][] isMarked,
+                     String prefix, TrieNode currentNode) {
         if (row < 0 || col < 0 || row >= board.rows() || col >= board.cols()) return;
         if (isMarked[row][col]) return;
 
         Character c = board.getLetter(row, col);
-        if (c.equals('Q'))
+        int d;
+        if (c.equals('Q')) {
             prefix += "QU";
-        else
+            d = prefix.length() - 2;
+        } else {
             prefix += c;
-        if (!isPrefixOfWord(prefix)) return;
-
-        boolean[][] isMarkedCopyed = arrayCopy(isMarked);
-        isMarkedCopyed[row][col] = true;
-        dfs(board, row - 1, col - 1, isMarkedCopyed, prefix);
-        dfs(board, row - 1, col, isMarkedCopyed, prefix);
-        dfs(board, row - 1, col + 1, isMarkedCopyed, prefix);
-        dfs(board, row, col - 1, isMarkedCopyed, prefix);
-        dfs(board, row, col + 1, isMarkedCopyed, prefix);
-        dfs(board, row + 1, col - 1, isMarkedCopyed, prefix);
-        dfs(board, row + 1, col, isMarkedCopyed, prefix);
-        dfs(board, row + 1, col + 1, isMarkedCopyed, prefix);
-
-        return;
-    }
-
-    private boolean[][] arrayCopy(boolean[][] arr) {
-        boolean[][] copyedArr = new boolean[arr.length][];
-        for (int i = 0; i < arr.length; i++) {
-            copyedArr[i] = Arrays.copyOf(arr[i], arr[i].length);
+            d = prefix.length() - 1;
         }
-        return copyedArr;
 
+        TrieNode nextNode = getNextNode(currentNode, prefix, d);
+        if (nextNode == null) return;
+
+        isMarked[row][col] = true;
+        dfs(board, row - 1, col - 1, isMarked, prefix, nextNode);
+        dfs(board, row - 1, col, isMarked, prefix, nextNode);
+        dfs(board, row - 1, col + 1, isMarked, prefix, nextNode);
+        dfs(board, row, col - 1, isMarked, prefix, nextNode);
+        dfs(board, row, col + 1, isMarked, prefix, nextNode);
+        dfs(board, row + 1, col - 1, isMarked, prefix, nextNode);
+        dfs(board, row + 1, col, isMarked, prefix, nextNode);
+        dfs(board, row + 1, col + 1, isMarked, prefix, nextNode);
+        isMarked[row][col] = false;
     }
 
-    private boolean isPrefixOfWord(String prefix) {
-        if (prefix.length() < 3) return true;
-
-        TrieNode node = dictionarySet.keyNodeWithPrefix(prefix);
-        if (node == null)
-            return false;
-
-        if (node.val != null)
+    private TrieNode getNextNode(TrieNode currentNode, String prefix, int d) {
+        TrieNode nextNode = trie.getNonRecursive(currentNode, prefix, d);
+        if (nextNode != null && nextNode.val != null && prefix.length() > 2)
             validWord.add(prefix);
-
-        return true;
+        return nextNode;
     }
 
     /**
@@ -109,7 +98,7 @@ public class BoggleSolver {
      * @return
      */
     public int scoreOf(String word) {
-        if (dictionarySet.contains(word)) {
+        if (trie.contains(word)) {
             switch (word.length()) {
                 case 0:
                 case 1:
