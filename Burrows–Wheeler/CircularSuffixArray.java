@@ -1,11 +1,58 @@
+import java.util.Arrays;
+
 public class CircularSuffixArray {
+
+    private String s;
+    private Suffix[] suffixes;
+
     /**
      * circular suffix array of s
      *
      * @param s
      */
     public CircularSuffixArray(String s) {
+        if (s == null) throw new IllegalArgumentException();
+        int n = s.length();
+        this.s = s;
+        this.suffixes = new Suffix[n];
+        for (int i = 0; i < n; i++)
+            suffixes[i] = new Suffix(s, i);
+        Arrays.sort(suffixes);
+    }
 
+    private static class Suffix implements Comparable<Suffix> {
+        private final String text;
+        private final int index;
+
+        private Suffix(String text, int index) {
+            this.text = text;
+            this.index = index;
+        }
+
+        private int length() {
+            return text.length() - index;
+        }
+
+        private char charAt(int i) {
+            if (index + i < text.length())
+                return text.charAt(index + i);
+            else
+                return text.charAt(index + i - text.length());
+        }
+
+        public int compareTo(Suffix that) {
+            if (this == that) return 0;  // optimization
+            int n = text.length();
+            for (int i = 0; i < n; i++) {
+                if (this.charAt(i) < that.charAt(i)) return -1;
+                if (this.charAt(i) > that.charAt(i)) return +1;
+            }
+            return this.length() - that.length();
+        }
+
+        public String toString() {
+            return text.substring(index);
+        }
     }
 
     /**
@@ -14,7 +61,7 @@ public class CircularSuffixArray {
      * @return
      */
     public int length() {
-        return 0;
+        return s.length();
     }
 
     /**
@@ -24,7 +71,8 @@ public class CircularSuffixArray {
      * @return
      */
     public int index(int i) {
-        return 0;
+        if (i < 0 || i >= length()) throw new IllegalArgumentException();
+        return suffixes[i].index;
     }
 
     public static void main(String[] args) {
