@@ -60,4 +60,19 @@ class CircularSuffixArrayTest {
             StdOut.println(suffixArray.index(i));
         }
     }
+
+    @Test
+    public void testDickens() {
+        In in = new In("testcases/dickens.txt");
+        int n = 64000;
+        char[] chars = new char[n];
+        for (int i = 0; i < n; i++)
+            chars[i] = in.readChar();
+
+        String str = new String(chars);
+        CircularSuffixArray suffixArray = new CircularSuffixArray(str);
+        for (int i = 0; i < str.length(); i++) {
+            StdOut.println(suffixArray.index(i));
+        }
+    }
 }

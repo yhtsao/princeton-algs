@@ -29,10 +29,6 @@ public class CircularSuffixArray {
             this.index = index;
         }
 
-        private int length() {
-            return text.length() - index;
-        }
-
         private char charAt(int i) {
             if (index + i < text.length())
                 return text.charAt(index + i);
@@ -41,17 +37,12 @@ public class CircularSuffixArray {
         }
 
         public int compareTo(Suffix that) {
-            if (this == that) return 0;  // optimization
             int n = text.length();
             for (int i = 0; i < n; i++) {
                 if (this.charAt(i) < that.charAt(i)) return -1;
                 if (this.charAt(i) > that.charAt(i)) return +1;
             }
-            return this.length() - that.length();
-        }
-
-        public String toString() {
-            return text.substring(index);
+            return 0;
         }
     }
 
