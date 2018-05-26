@@ -71,6 +71,7 @@ class CircularSuffixArrayTest {
 
         String str = new String(chars);
         CircularSuffixArray suffixArray = new CircularSuffixArray(str);
+        StdOut.println("done");
         for (int i = 0; i < str.length(); i++) {
             StdOut.println(suffixArray.index(i));
         }
