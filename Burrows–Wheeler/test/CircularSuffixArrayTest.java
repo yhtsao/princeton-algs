@@ -1,4 +1,3 @@
-import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 import org.junit.jupiter.api.Assertions;
